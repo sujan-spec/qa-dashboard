@@ -1,61 +1,83 @@
 const SHEET_ID = "1B1cwUPkMjnDnH9LWM014qTcDG7-SdP3lnWViI9b05pY";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-async function loadData() {
+let allData = [];
 
+async function loadData() {
     const response = await fetch(SHEET_URL);
     const text = await response.text();
 
-    const json = JSON.parse(text.substr(47).slice(0, -2));
+    const json = JSON.parse(text.substring(47).slice(0, -2));
     const rows = json.table.rows;
 
+    allData = rows.map(row => ({
+        jira: row.c[0]?.v || "",
+        qa: row.c[1]?.v || "",
+        type: row.c[2]?.v || "",
+        dev: row.c[3]?.v || "",
+        priority: row.c[4]?.v || "",
+        complexity: row.c[5]?.v || "",
+        status: row.c[6]?.v || ""
+    }));
+
+    updateDashboard(allData);
+}
+
+function updateDashboard(data) {
     const tbody = document.querySelector("#taskTable tbody");
     tbody.innerHTML = "";
 
-    const qaCount = {};
-
-    rows.forEach(row => {
-
-        const jira = row.c[0]?.v || "";
-        const qa = row.c[1]?.v || "";
-        const type = row.c[2]?.v || "";
-        const dev = row.c[3]?.v || "";
-        const priority = row.c[4]?.v || "";
-        const complexity = row.c[5]?.v || "";
-        const status = row.c[6]?.v || "";
-
-        tbody.innerHTML += `
-            <tr>
-                <td>${jira}</td>
-                <td>${qa}</td>
-                <td>${type}</td>
-                <td>${dev}</td>
-                <td>${priority}</td>
-                <td>${complexity}</td>
-                <td>${status}</td>
-            </tr>
+    data.forEach(task => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${task.jira}</td>
+            <td>${task.qa}</td>
+            <td>${task.type}</td>
+            <td>${task.dev}</td>
+            <td>${task.priority}</td>
+            <td>${task.complexity}</td>
+            <td>${task.status}</td>
         `;
-
-        qaCount[qa] = (qaCount[qa] || 0) + 1;
+        tbody.appendChild(tr);
     });
 
-    updateChart(qaCount);
+    // Update Summary Cards
+    document.getElementById("totalTasks").innerText = data.length;
+    document.getElementById("p1Tasks").innerText =
+        data.filter(t => t.priority === "P1").length;
+
+    document.getElementById("liveTasks").innerText =
+        data.filter(t => t.status === "LIVE").length;
+
+    document.getElementById("uatTasks").innerText =
+        data.filter(t => t.status === "UAT").length;
+
+    updateChart(data);
 }
 
-function updateChart(qaCount) {
+let chart;
 
-    const ctx = document.getElementById("qaChart");
+function updateChart(data) {
+    const qaCounts = {};
 
-    new Chart(ctx, {
+    data.forEach(task => {
+        qaCounts[task.qa] = (qaCounts[task.qa] || 0) + 1;
+    });
+
+    const ctx = document.getElementById("qaChart").getContext("2d");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
         type: "bar",
         data: {
-            labels: Object.keys(qaCount),
+            labels: Object.keys(qaCounts),
             datasets: [{
                 label: "Tasks per QA",
-                data: Object.values(qaCount)
+                data: Object.values(qaCounts)
             }]
         }
     });
 }
 
-window.onload = loadData;
+loadData();
