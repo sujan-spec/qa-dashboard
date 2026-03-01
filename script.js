@@ -2,6 +2,7 @@ const SHEET_ID = "1B1cwUPkMjnDnH9LWM014qTcDG7-SdP3lnWViI9b05pY";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 let allData = [];
+let chart;
 
 async function loadData() {
     const response = await fetch(SHEET_URL);
@@ -20,9 +21,9 @@ async function loadData() {
         status: row.c[6]?.v || ""
     }));
 
-    applyFilters();
-
+    applyFilters(); // 👈 Important
 }
+
 function applyFilters() {
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
     const qaValue = document.getElementById("qaFilter").value;
@@ -58,7 +59,6 @@ function updateDashboard(data) {
         tbody.appendChild(tr);
     });
 
-    // Update Summary Cards
     document.getElementById("totalTasks").innerText = data.length;
     document.getElementById("p1Tasks").innerText =
         data.filter(t => t.priority === "P1").length;
@@ -71,8 +71,6 @@ function updateDashboard(data) {
 
     updateChart(data);
 }
-
-let chart;
 
 function updateChart(data) {
     const qaCounts = {};
@@ -96,5 +94,8 @@ function updateChart(data) {
         }
     });
 }
+
+/* 🔥 IMPORTANT CHANGE HERE */
+document.querySelector("button").addEventListener("click", applyFilters);
 
 loadData();
