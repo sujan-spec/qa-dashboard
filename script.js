@@ -1,5 +1,5 @@
-const SHEET_ID = "1ujZg6dQvL4vpYXeWHY6VGgYh9w3lUdph3YLEeAYtUhU";
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${S-68/S-46}/gviz/tq?tqx=out:json`;
+const SHEET_ID = "1B1cwUPkMjnDnH9LWM014qTcDG7-SdP3lnWViI9b05pY";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 async function loadData() {
 
