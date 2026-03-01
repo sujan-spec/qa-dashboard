@@ -20,7 +20,24 @@ async function loadData() {
         status: row.c[6]?.v || ""
     }));
 
-    updateDashboard(allData);
+    applyFilters();
+
+}
+function applyFilters() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const qaValue = document.getElementById("qaFilter").value;
+    const statusValue = document.getElementById("statusFilter").value;
+
+    let filteredData = allData.filter(task => {
+
+        const matchSearch = task.jira.toLowerCase().includes(searchValue);
+        const matchQA = qaValue === "" || task.qa === qaValue;
+        const matchStatus = statusValue === "" || task.status === statusValue;
+
+        return matchSearch && matchQA && matchStatus;
+    });
+
+    updateDashboard(filteredData);
 }
 
 function updateDashboard(data) {
