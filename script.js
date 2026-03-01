@@ -5,7 +5,7 @@ let allData = [];
 let chart;
 
 /* =========================
-   LOAD DATA FROM SHEET
+   LOAD DATA FROM GOOGLE SHEET
 ========================= */
 async function loadData() {
     try {
@@ -15,9 +15,10 @@ async function loadData() {
         const json = JSON.parse(text.substring(47).slice(0, -2));
         const rows = json.table.rows;
 
+        // ✅ Correct Column Mapping Based On Your Sheet
         allData = rows.map(row => ({
-            jira: row.c[0]?.v?.toString().trim() || "",
-            qa: row.c[1]?.v?.toString().trim() || "",
+            qa: row.c[0]?.v?.toString().trim() || "",
+            jira: row.c[1]?.v?.toString().trim() || "",
             type: row.c[2]?.v?.toString().trim() || "",
             dev: row.c[3]?.v?.toString().trim() || "",
             priority: row.c[4]?.v?.toString().trim() || "",
@@ -43,16 +44,18 @@ function applyFilters() {
 
     const filteredData = allData.filter(task => {
 
+        const jira = task.jira.toLowerCase();
+        const qa = task.qa.toLowerCase();
+        const status = task.status.toLowerCase();
+
         const matchSearch =
-            task.jira.toLowerCase().includes(searchValue);
+            searchValue === "" || jira.includes(searchValue);
 
         const matchQA =
-            qaValue === "" ||
-            task.qa.toLowerCase() === qaValue;
+            qaValue === "" || qa.includes(qaValue);
 
         const matchStatus =
-            statusValue === "" ||
-            task.status.toLowerCase() === statusValue;
+            statusValue === "" || status === statusValue;
 
         return matchSearch && matchQA && matchStatus;
     });
@@ -61,7 +64,7 @@ function applyFilters() {
 }
 
 /* =========================
-   UPDATE TABLE + CARDS
+   UPDATE TABLE + SUMMARY
 ========================= */
 function updateDashboard(data) {
 
@@ -82,7 +85,7 @@ function updateDashboard(data) {
         tbody.appendChild(tr);
     });
 
-    // Summary Cards
+    // ✅ Summary Cards
     document.getElementById("totalTasks").innerText = data.length;
 
     document.getElementById("p1Tasks").innerText =
@@ -126,9 +129,7 @@ function updateChart(data) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    display: false
-                }
+                legend: { display: false }
             }
         }
     });
@@ -137,8 +138,11 @@ function updateChart(data) {
 /* =========================
    EVENT LISTENERS
 ========================= */
+
+// Button click
 document.querySelector("button").addEventListener("click", applyFilters);
 
+// Live search while typing
 document.getElementById("searchInput").addEventListener("keyup", applyFilters);
 
 /* =========================
