@@ -16,13 +16,13 @@ async function loadData() {
 
     rows.forEach(row => {
 
-        const jira = row.c[1]?.v || "";
-        const qa = row.c[2]?.v || "";
-        const type = row.c[3]?.v || "";
-        const dev = row.c[4]?.v || "";
-        const priority = row.c[5]?.v || "";
-        const complexity = row.c[6]?.v || "";
-        const status = row.c[7]?.v || "";
+        const jira = row.c[0]?.v || "";
+        const qa = row.c[1]?.v || "";
+        const type = row.c[2]?.v || "";
+        const dev = row.c[3]?.v || "";
+        const priority = row.c[4]?.v || "";
+        const complexity = row.c[5]?.v || "";
+        const status = row.c[6]?.v || "";
 
         tbody.innerHTML += `
             <tr>
