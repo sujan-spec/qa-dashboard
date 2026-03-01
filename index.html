@@ -3,73 +3,85 @@
 <head>
     <title>QA Activity Dashboard</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-    <h1>QA Activity Dashboard</h1>
+    <header>
+        <h1>QA Activity Dashboard</h1>
+        <p>Daily QA Tracking & Visualization</p>
+    </header>
 
-    <!-- FILTER SECTION -->
-    <div class="filter-section">
-        <select id="qaFilter">
-            <option value="">All QA</option>
-        </select>
-
-        <select id="statusFilter">
-            <option value="">All Status</option>
-        </select>
-
-        <button onclick="loadData()">Refresh</button>
-    </div>
-
-    <!-- SUMMARY CARDS -->
-    <div class="summary">
+    <section class="summary">
         <div class="card">
             <h3>Total Tasks</h3>
             <p id="totalTasks">0</p>
         </div>
 
         <div class="card">
+            <h3>P1 Tasks</h3>
+            <p id="p1Tasks">0</p>
+        </div>
+
+        <div class="card">
             <h3>LIVE Releases</h3>
-            <p id="liveCount">0</p>
+            <p id="liveTasks">0</p>
         </div>
 
         <div class="card">
             <h3>UAT Releases</h3>
-            <p id="uatCount">0</p>
+            <p id="uatTasks">0</p>
         </div>
+    </section>
 
-        <div class="card">
-            <h3>P1 Tasks</h3>
-            <p id="p1Count">0</p>
-        </div>
-    </div>
+    <section class="filters">
+        <input type="text" id="searchInput" placeholder="Search Jira ID">
 
-    <!-- TABLE -->
-    <h2>Daily Activity</h2>
-    <table id="taskTable">
-        <thead>
-            <tr>
-                <th>Jira</th>
-                <th>QA</th>
-                <th>Type</th>
-                <th>Dev</th>
-                <th>Priority</th>
-                <th>Complexity</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+        <select id="qaFilter">
+            <option value="">All QA</option>
+            <option>Adarsh</option>
+            <option>Arpita</option>
+            <option>Mamata</option>
+            <option>Soudip</option>
+            <option>Sujan</option>
+        </select>
 
-    <!-- CHART -->
-    <h2>Visualization</h2>
-    <canvas id="qaChart"></canvas>
+        <select id="statusFilter">
+            <option value="">All Status</option>
+            <option>LIVE</option>
+            <option>UAT</option>
+            <option>WIP</option>
+            <option>DONE</option>
+        </select>
 
-    <script src="script.js"></script>
+        <button onclick="loadData()">Apply Filter</button>
+    </section>
+
+    <section class="table-section">
+        <h2>Daily Activity</h2>
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th>Jira</th>
+                    <th>QA</th>
+                    <th>Type</th>
+                    <th>Dev</th>
+                    <th>Priority</th>
+                    <th>Complexity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <section class="charts">
+        <h2>Visualization</h2>
+        <canvas id="qaChart"></canvas>
+    </section>
+
+<script src="script.js"></script>
 
 </body>
 </html>
