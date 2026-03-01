@@ -1,46 +1,61 @@
-const API_URL = "https://script.google.com/a/macros/sundewsolutions.com/s/AKfycbxMYgifuEUcaD8g4tUAGK-MOCQlAEs7FKps3DR-ZLCS56fmje270qRz1tLhFrQYX-Jg-w/exec";
-
-async function addTask() {
-
-  const data = {
-    jiraId: document.getElementById("jiraId").value,
-    qaName: document.getElementById("qaName").value,
-    taskType: document.getElementById("taskType").value,
-    developer: document.getElementById("developer").value,
-    priority: document.getElementById("priority").value,
-    complexity: document.getElementById("complexity").value,
-    status: document.getElementById("status").value
-  };
-
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
-
-  loadData();
-}
+const SHEET_ID = "1ujZg6dQvL4vpYXeWHY6VGgYh9w3lUdph3YLEeAYtUhU";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${S-68/S-46}/gviz/tq?tqx=out:json`;
 
 async function loadData() {
-  const response = await fetch(API_URL);
-  const data = await response.json();
 
-  const tbody = document.querySelector("#taskTable tbody");
-  tbody.innerHTML = "";
+    const response = await fetch(SHEET_URL);
+    const text = await response.text();
 
-  data.forEach(row => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${row[1]}</td>
-        <td>${row[2]}</td>
-        <td>${row[3]}</td>
-        <td>${row[4]}</td>
-        <td>${row[5]}</td>
-        <td>${row[6]}</td>
-        <td>${row[7]}</td>
-      </tr>
-    `;
-  });
+    const json = JSON.parse(text.substr(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    const tbody = document.querySelector("#taskTable tbody");
+    tbody.innerHTML = "";
+
+    const qaCount = {};
+
+    rows.forEach(row => {
+
+        const jira = row.c[1]?.v || "";
+        const qa = row.c[2]?.v || "";
+        const type = row.c[3]?.v || "";
+        const dev = row.c[4]?.v || "";
+        const priority = row.c[5]?.v || "";
+        const complexity = row.c[6]?.v || "";
+        const status = row.c[7]?.v || "";
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${jira}</td>
+                <td>${qa}</td>
+                <td>${type}</td>
+                <td>${dev}</td>
+                <td>${priority}</td>
+                <td>${complexity}</td>
+                <td>${status}</td>
+            </tr>
+        `;
+
+        qaCount[qa] = (qaCount[qa] || 0) + 1;
+    });
+
+    updateChart(qaCount);
 }
 
+function updateChart(qaCount) {
+
+    const ctx = document.getElementById("qaChart");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: Object.keys(qaCount),
+            datasets: [{
+                label: "Tasks per QA",
+                data: Object.values(qaCount)
+            }]
+        }
+    });
+}
 
 window.onload = loadData;
