@@ -74,12 +74,14 @@ header h1 {
     background: #2a5298;
 }
 
-/* Section Card */
+/* ===============================
+   TABLE SECTION CARD
+================================ */
 .table-section {
     background: #ffffff;
     padding: 25px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     margin-top: 30px;
 }
 
@@ -90,71 +92,73 @@ header h1 {
     color: #111827;
 }
 
-/* Scroll container */
+/* ===============================
+   SCROLL WRAPPER
+================================ */
 .table-wrapper {
     max-height: 320px;
     overflow-y: auto;
     border-radius: 12px;
 }
 
-/* Table */
+/* ===============================
+   TABLE BASE
+================================ */
 #taskTable {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 8px; /* Row gap */
+    border-collapse: collapse;   /* Important */
     font-size: 14px;
 }
 
-/* Header */
+/* ===============================
+   HEADER STYLE (CLEARLY DIFFERENT)
+================================ */
+#taskTable thead {
+    background: #1e293b;   /* Dark header */
+}
+
 #taskTable thead th {
     position: sticky;
     top: 0;
-    background: #f9fafb;
-    color: #374151;
-    text-transform: uppercase;
-    font-size: 12px;
+    background: #1e293b;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
     letter-spacing: 0.5px;
-    padding: 12px 15px;
+    padding: 14px 15px;
     text-align: left;
 }
 
-/* Body rows as cards */
+/* ===============================
+   TABLE BODY
+================================ */
 #taskTable tbody tr {
-    background: #f8fafc;
-    transition: all 0.2s ease;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s ease;
 }
 
-#taskTable tbody tr:hover {
-    background: #eef2ff;
-    transform: scale(1.01);
-}
-
-/* Cells */
-#taskTable td {
+#taskTable tbody td {
     padding: 14px 15px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
+    color: #374151;
 }
 
-/* Rounded row effect */
-#taskTable tbody tr td:first-child {
-    border-left: 1px solid #f1f5f9;
-    border-radius: 10px 0 0 10px;
+/* ===============================
+   HOVER EFFECT (CLEAN)
+================================ */
+#taskTable tbody tr:hover {
+    background: #f1f5f9;
 }
 
-#taskTable tbody tr td:last-child {
-    border-right: 1px solid #f1f5f9;
-    border-radius: 0 10px 10px 0;
-}
-
-/* Custom Scrollbar */
+/* ===============================
+   SCROLLBAR
+================================ */
 .table-wrapper::-webkit-scrollbar {
     width: 6px;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
-    background: #c7d2fe;
-    border-radius: 10px;
+    background: #cbd5e1;
+    border-radius: 6px;
 }
 
 .charts {
