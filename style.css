@@ -214,3 +214,32 @@ header h1 {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     margin-top: 20px;
 }
+
+.table-top-bar {
+    display: flex;
+    justify-content: space-between;   /* pushes button to right */
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Title styling (optional small enhancement) */
+.table-top-bar h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+}
+
+#exportBtn {
+    background: #1e293b;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+#exportBtn:hover {
+    background: #334155;
+}

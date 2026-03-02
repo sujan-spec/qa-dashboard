@@ -149,11 +149,26 @@ data.forEach(task => {
     document.getElementById("p1Tasks").innerText =
         data.filter(t => t.priority.toLowerCase() === "p1").length;
 
+    document.getElementById("p2Tasks").innerText =
+        data.filter(t => t.priority.toLowerCase() === "p2").length;
+
+    document.getElementById("p3Tasks").innerText =
+        data.filter(t => t.priority.toLowerCase() === "p3").length;
+
+    document.getElementById("p4Tasks").innerText =
+        data.filter(t => t.priority.toLowerCase() === "p4").length;
+
     document.getElementById("liveTasks").innerText =
         data.filter(t => t.status.toLowerCase() === "live").length;
 
+    document.getElementById("doneTasks").innerText =
+        data.filter(t => t.status.toLowerCase() === "done").length;
+
     document.getElementById("uatTasks").innerText =
         data.filter(t => t.status.toLowerCase() === "uat").length;
+
+    document.getElementById("notstartedTasks").innerText =
+        data.filter(t => t.status.toLowerCase() === "not started").length;
 
     updateChart(data);
 }
@@ -163,37 +178,69 @@ data.forEach(task => {
 ========================= */
 function updateChart(data) {
 
-    const qaCounts = {};
+    const qaList = [...new Set(data.map(t => t.qa).filter(Boolean))];
 
-    data.forEach(task => {
-        if (task.qa) {
-            qaCounts[task.qa] = (qaCounts[task.qa] || 0) + 1;
-        }
+    const totalCounts = [];
+    const featureCounts = [];
+    const bugCounts = [];
+
+    qaList.forEach(qa => {
+
+        const qaTasks = data.filter(t => t.qa === qa);
+
+        // 1️⃣ Total
+        totalCounts.push(qaTasks.length);
+
+        // 2️⃣ Enhancement + Task + Epic + Story + New Feature
+        const featureSum = qaTasks.filter(t => {
+            const type = t.type.toLowerCase();
+            return (
+                type === "enhancement" ||
+                type === "task" ||
+                type === "epic" ||
+                type === "story" ||
+                type === "new feature"
+            );
+        }).length;
+
+        featureCounts.push(featureSum);
+
+        // 3️⃣ Bug
+        const bugSum = qaTasks.filter(t =>
+            t.type.toLowerCase() === "bug"
+        ).length;
+
+        bugCounts.push(bugSum);
     });
 
     const ctx = document.getElementById("qaChart").getContext("2d");
 
     if (chart) chart.destroy();
 
-    // 🔥 Gradient for modern look
-    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-    gradient.addColorStop(0, "#4f46e5");
-    gradient.addColorStop(1, "#06b6d4");
-
-    const values = Object.values(qaCounts);
-
     chart = new Chart(ctx, {
         type: "bar",
         data: {
-            labels: Object.keys(qaCounts),
-            datasets: [{
-                data: values,
-                backgroundColor: gradient,
-                borderRadius: 8,
-                borderSkipped: false,
-                barThickness: 25,
-                maxBarThickness: 30
-            }]
+            labels: qaList,
+            datasets: [
+                {
+                    label: "Total Tasks",
+                    data: totalCounts,
+                    backgroundColor: "#374151",  // Dark Grey
+                    borderRadius: 6
+                },
+                {
+                    label: "Enhancement+Task+Epic+Story+New Feature",
+                    data: featureCounts,
+                    backgroundColor: "#16a34a",  // Green
+                    borderRadius: 6
+                },
+                {
+                    label: "Bug",
+                    data: bugCounts,
+                    backgroundColor: "#dc2626",  // Red
+                    borderRadius: 6
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -205,24 +252,14 @@ function updateChart(data) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    suggestedMax: Math.max(...values) + 1,
                     ticks: {
-                        stepSize: 1,
-                        precision: 0
-                    },
-                    grid: {
-                        color: "rgba(0,0,0,0.05)"
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
+                        stepSize: 1
                     }
                 }
             },
             plugins: {
                 legend: {
-                    display: false
+                    position: "top"
                 },
                 tooltip: {
                     backgroundColor: "#111827",
@@ -234,15 +271,49 @@ function updateChart(data) {
     });
 }
 
-/* =========================
-   EVENT LISTENERS
-========================= */
-
 // Button click
 document.querySelector("button").addEventListener("click", applyFilters);
+document.getElementById("refreshBtn").addEventListener("click", () => {
+    loadData();   // Re-fetch data from Google Sheet
+});
 
 // Live search while typing
 document.getElementById("searchInput").addEventListener("keyup", applyFilters);
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+
+    if (!allData.length) return;
+
+    const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
+    const qaValue = document.getElementById("qaFilter").value.toLowerCase().trim();
+    const statusValue = document.getElementById("statusFilter").value.toLowerCase().trim();
+
+    const filteredData = allData.filter(task => {
+        const matchSearch = !searchValue || task.jira.toLowerCase().includes(searchValue);
+        const matchQA = !qaValue || task.qa.toLowerCase().includes(qaValue);
+        const matchStatus = !statusValue || task.status.toLowerCase() === statusValue;
+        return matchSearch && matchQA && matchStatus;
+    });
+
+    let csv = "QA,Jira,Related Jira,Task Type,Status,QA ETA(Sujan),QA ETA(Assignee),Developer,Priority,Complexity,QA Release,Client Release,Build QA,Remarks\n";
+
+    filteredData.forEach(task => {
+        csv += `"${task.qa}","${task.jira}","${task.relatedJira}","${task.type}","${task.status}",
+"${task.etaSujan}","${task.etaAssignee}","${task.developer}","${task.priority}",
+"${task.complexity}","${task.qaRelease}","${task.clientRelease}",
+"${task.buildQA}","${task.remarks}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "QA_Daily_Activity.csv";
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+});
 
 /* =========================
    INITIAL LOAD

@@ -24,14 +24,39 @@
             <p id="p1Tasks">0</p>
         </div>
 
+         <div class="card">
+            <h3>P2 Tasks</h3>
+            <p id="p2Tasks">0</p>
+        </div>
+
+        <div class="card">
+            <h3>P3 Tasks</h3>
+            <p id="p3Tasks">0</p>
+        </div>
+
+        <div class="card">
+            <h3>P4 Tasks</h3>
+            <p id="p4Tasks">0</p>
+        </div>
+
         <div class="card">
             <h3>LIVE Releases</h3>
             <p id="liveTasks">0</p>
         </div>
 
         <div class="card">
+            <h3>DONE</h3>
+            <p id="doneTasks">0</p>
+        </div>
+
+        <div class="card">
             <h3>UAT Releases</h3>
             <p id="uatTasks">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Not Started</h3>
+            <p id="notstartedTasks">0</p>
         </div>
     </section>
 
@@ -55,11 +80,16 @@
             <option>DONE</option>
         </select>
 
-        <button onclick="loadData()">Apply Filter</button>
+        <button onclick="applyFilters()">Apply Filter</button>
+        <button id="refreshBtn">Refresh</button>
     </section>
 
     <section class="table-section">
-    <h2>Daily Activity</h2>
+    <div class="table-top-bar">
+        <h2>Daily Activity</h2>
+        <button id="exportBtn">Export CSV</button>
+    </div>
+    
 
     <div class="table-wrapper">
         <table id="taskTable">
