@@ -75,30 +75,59 @@ header h1 {
 }
 
 .table-section {
+    background: #ffffff;
     padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    margin-top: 25px;
 }
 
-table {
+.table-section h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* 🔥 Scrollable Area */
+.table-wrapper {
+    max-height: 300px;   /* FIXED HEIGHT */
+    overflow-y: auto;    /* SCROLL ENABLED */
+    border-radius: 10px;
+}
+
+/* Sticky Header */
+.table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 2;
+}
+
+#taskTable {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    font-size: 14px;
 }
 
-thead {
-    background: #1e3c72;
-    color: white;
+#taskTable th,
+#taskTable td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
 }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
+#taskTable tbody tr:hover {
+    background: #f3f4f6;
 }
 
-tbody tr:hover {
-    background-color: #e3f2fd;   /* ← CHANGED (light blue highlight) */
-    transition: background-color 0.2s ease-in-out;  /* ← ADDED smooth effect */
+/* Clean Scrollbar */
+.table-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
 }
 
 .charts {
