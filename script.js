@@ -75,21 +75,25 @@ data.forEach(task => {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-        <td>${task.qa || "-"}</td>
-        <td>${task.jira || "-"}</td>
-        <td>${task.relatedjiraid || "-"}</td>
-        <td>${task.type || "-"}</td>
-        <td>${task.status || "-"}</td>
-        <td>${task.qaetahrsgivenbysujan || "-"}</td>
-        <td>${task.qaetahrsgivenbyasignee || "-"}</td>
-        <td>${task.internaljiralink || "-"}</td>
-        <td>${task.developer || "-"}</td>
-        <td>${task.priority || "-"}</td>
-        <td>${task.complexity || "-"}</td>
-        <td>${task.qareleasedate || "-"}</td>
-        <td>${task.clientreleasedate || "-"}</td>
-        <td>${task.releasedbuildforqa || "-"}</td>
-        <td>${task.remarks || "-"}</td>
+        <td>${task["QA"] || "-"}</td>
+            <td>${task["Jira"] || "-"}</td>
+            <td>${task["Related Jira ID"] || "-"}</td>
+            <td>${task["Task Type"] || "-"}</td>
+            <td>${task["Status"] || "-"}</td>
+            <td>${task["QA ETA(Hrs)[Given by SUJAN]"] || "-"}</td>
+            <td>${task["QA ETA(Hrs)[Given by Assignee]"] || "-"}</td>
+            <td>
+                ${task["Internal Jira Link"] 
+                    ? `<a href="${task["Internal Jira Link"]}" target="_blank">View</a>` 
+                    : "-"}
+            </td>
+            <td>${task["Developer"] || "-"}</td>
+            <td>${task["Priority"] || "-"}</td>
+            <td>${task["Complexity"] || "-"}</td>
+            <td>${task["QA Release Date"] || "-"}</td>
+            <td>${task["Client Release Date"] || "-"}</td>
+            <td>${task["Released Build for QA"] || "-"}</td>
+            <td>${task["Remarks/Blocker (if any)"] || "-"}</td>
     `;
 
     tbody.appendChild(tr);

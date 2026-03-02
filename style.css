@@ -157,13 +157,42 @@ header h1 {
 }
 
 .table-wrapper {
-    max-height: 350px;
+    max-height: 400px;       /* Vertical scroll */
     overflow-y: auto;
-    overflow-x: auto;   /* 🔥 ADD THIS */
+    overflow-x: auto;        /* Horizontal scroll */
+    border-radius: 10px;
+    border: 1px solid #ddd;
 }
 
 #taskTable {
-    min-width: 1400px;   /* Forces horizontal scroll */
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1800px;       /* Force horizontal scroll */
+}
+
+#taskTable thead {
+    position: sticky;
+    top: 0;
+    background-color: #1f2a40;
+    color: white;
+    z-index: 10;
+}
+
+#taskTable th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#taskTable td {
+    padding: 10px;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+}
+
+#taskTable tbody tr:hover {
+    background-color: #f5f7fa;
 }
 
 .charts {
