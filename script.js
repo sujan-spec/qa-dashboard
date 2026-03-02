@@ -69,29 +69,31 @@ function applyFilters() {
 function updateDashboard(data) {
 
     const tbody = document.querySelector("#taskTable tbody");
-    tbody.innerHTML = "";
+tbody.innerHTML = "";
 
-    data.forEach(task => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${task.qa}</td>
-            <td>${task.jira}</td>
-            <td>${task.relatedjiraid}</td>
-            <td>${task.type}</td>
-            <td>${task.status}</td>
-            <td>${task.qaetahrsgivenbysujan}</td>
-            <td>${task.qaetahrsgivenbyasignee}</td>
-            <td>${task.internaljiralink}</td>
-            <td>${task.developer}</td>
-            <td>${task.priority}</td>
-            <td>${task.complexity}</td>
-            <td>${task.qareleasedate}</td>
-            <td>${task.clientreleasedate}</td>
-            <td>${task.releasedbuildforqa}</td>            
-            <td>${task.remarks}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+data.forEach(task => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td>${task.qa || "-"}</td>
+        <td>${task.jira || "-"}</td>
+        <td>${task.relatedjiraid || "-"}</td>
+        <td>${task.type || "-"}</td>
+        <td>${task.status || "-"}</td>
+        <td>${task.qaetahrsgivenbysujan || "-"}</td>
+        <td>${task.qaetahrsgivenbyasignee || "-"}</td>
+        <td>${task.internaljiralink || "-"}</td>
+        <td>${task.developer || "-"}</td>
+        <td>${task.priority || "-"}</td>
+        <td>${task.complexity || "-"}</td>
+        <td>${task.qareleasedate || "-"}</td>
+        <td>${task.clientreleasedate || "-"}</td>
+        <td>${task.releasedbuildforqa || "-"}</td>
+        <td>${task.remarks || "-"}</td>
+    `;
+
+    tbody.appendChild(tr);
+});
 
     // ✅ Summary Cards
     document.getElementById("totalTasks").innerText = data.length;

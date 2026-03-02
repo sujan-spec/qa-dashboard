@@ -156,9 +156,14 @@ header h1 {
     width: 6px;
 }
 
-.table-wrapper::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 6px;
+.table-wrapper {
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: auto;   /* 🔥 ADD THIS */
+}
+
+#taskTable {
+    min-width: 1400px;   /* Forces horizontal scroll */
 }
 
 .charts {
