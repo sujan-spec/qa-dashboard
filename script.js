@@ -74,8 +74,8 @@ function updateDashboard(data) {
     data.forEach(task => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${task.jira}</td>
             <td>${task.qa}</td>
+            <td>${task.jira}</td>
             <td>${task.type}</td>
             <td>${task.dev}</td>
             <td>${task.priority}</td>
@@ -128,6 +128,15 @@ function updateChart(data) {
         },
         options: {
             responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            },
             plugins: {
                 legend: { display: false }
             }
