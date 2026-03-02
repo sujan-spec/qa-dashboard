@@ -76,11 +76,19 @@ function updateDashboard(data) {
         tr.innerHTML = `
             <td>${task.qa}</td>
             <td>${task.jira}</td>
+            <td>${task.relatedjiraid}</td>
             <td>${task.type}</td>
-            <td>${task.dev}</td>
+            <td>${task.status}</td>
+            <td>${task.qaetahrsgivenbysujan}</td>
+            <td>${task.qaetahrsgivenbyasignee}</td>
+            <td>${task.internaljiralink}</td>
+            <td>${task.developer}</td>
             <td>${task.priority}</td>
             <td>${task.complexity}</td>
-            <td>${task.status}</td>
+            <td>${task.qareleasedate}</td>
+            <td>${task.clientreleasedate}</td>
+            <td>${task.releasedbuildforqa}</td>            
+            <td>${task.remarks}</td>
         `;
         tbody.appendChild(tr);
     });
