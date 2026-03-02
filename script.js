@@ -273,8 +273,20 @@ function updateChart(data) {
 
 // Button click
 document.querySelector("button").addEventListener("click", applyFilters);
-document.getElementById("refreshBtn").addEventListener("click", () => {
-    loadData();   // Re-fetch data from Google Sheet
+
+// ===============================
+// REFRESH BUTTON FUNCTIONALITY
+// ===============================
+
+document.getElementById("refreshBtn").addEventListener("click", function () {
+
+    // 1️⃣ Clear all filter inputs
+    document.getElementById("searchInput").value = "";
+    document.getElementById("qaFilter").value = "";
+    document.getElementById("statusFilter").value = "";
+
+    // 2️⃣ Reload full dashboard with original data
+    updateDashboard(allData);
 });
 
 // Live search while typing
