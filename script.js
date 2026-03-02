@@ -117,28 +117,69 @@ function updateChart(data) {
 
     if (chart) chart.destroy();
 
+    // 🔥 Create Gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, "#4f46e5");   // top
+    gradient.addColorStop(1, "#06b6d4");   // bottom
+
     chart = new Chart(ctx, {
         type: "bar",
         data: {
             labels: Object.keys(qaCounts),
             datasets: [{
                 label: "Tasks per QA",
-                data: Object.values(qaCounts)
+                data: Object.values(qaCounts),
+                backgroundColor: gradient,
+                borderRadius: 12,
+                borderSkipped: false,
+                barThickness: 40
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1200,
+                easing: "easeOutQuart"
+            },
             scales: {
                 y: {
                     beginAtZero: true,
+                    grid: {
+                        color: "rgba(0,0,0,0.05)"
+                    },
                     ticks: {
                         stepSize: 1,
-                        precision: 0
+                        precision: 0,
+                        font: {
+                            size: 13,
+                            weight: "bold"
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 13,
+                            weight: "bold"
+                        }
                     }
                 }
             },
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: "#111827",
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 },
+                    padding: 12,
+                    cornerRadius: 8
+                }
             }
         }
     });
