@@ -104,3 +104,13 @@ tbody tr:hover {
 .charts {
     padding: 30px;
 }
+
+.chart-container {
+    width: 100%;
+    height: 220px; /* Compact height */
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}

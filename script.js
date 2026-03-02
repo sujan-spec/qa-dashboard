@@ -117,55 +117,48 @@ function updateChart(data) {
 
     if (chart) chart.destroy();
 
-    // 🔥 Create Gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, "#4f46e5");   // top
-    gradient.addColorStop(1, "#06b6d4");   // bottom
+    // 🔥 Gradient for modern look
+    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, "#4f46e5");
+    gradient.addColorStop(1, "#06b6d4");
+
+    const values = Object.values(qaCounts);
 
     chart = new Chart(ctx, {
         type: "bar",
         data: {
             labels: Object.keys(qaCounts),
             datasets: [{
-                label: "Tasks per QA",
-                data: Object.values(qaCounts),
+                data: values,
                 backgroundColor: gradient,
-                borderRadius: 12,
+                borderRadius: 8,
                 borderSkipped: false,
-                barThickness: 40
+                barThickness: 25,
+                maxBarThickness: 30
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 1200,
+                duration: 800,
                 easing: "easeOutQuart"
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: {
-                        color: "rgba(0,0,0,0.05)"
-                    },
+                    suggestedMax: Math.max(...values) + 1,
                     ticks: {
                         stepSize: 1,
-                        precision: 0,
-                        font: {
-                            size: 13,
-                            weight: "bold"
-                        }
+                        precision: 0
+                    },
+                    grid: {
+                        color: "rgba(0,0,0,0.05)"
                     }
                 },
                 x: {
                     grid: {
                         display: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 13,
-                            weight: "bold"
-                        }
                     }
                 }
             },
@@ -175,10 +168,8 @@ function updateChart(data) {
                 },
                 tooltip: {
                     backgroundColor: "#111827",
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 13 },
-                    padding: 12,
-                    cornerRadius: 8
+                    padding: 10,
+                    cornerRadius: 6
                 }
             }
         }
