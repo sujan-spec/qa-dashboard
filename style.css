@@ -81,40 +81,67 @@ header h1 {
     background: #ffffff;
     padding: 25px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
     margin-top: 30px;
 }
 
-.table-section h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #111827;
+/* ===============================
+   SCROLL WRAPPER (X + Y)
+================================ */
+.table-wrapper {
+    max-height: 420px;
+    overflow: auto;        /* Enables both scroll */
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    scroll-behavior: smooth;
 }
 
 /* ===============================
-   SCROLL WRAPPER
+   LIGHT MODERN SCROLLBAR
 ================================ */
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f8fafc;   /* very light */
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;   /* light grey */
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;   /* slightly darker on hover */
+}
+
+/* Firefox */
 .table-wrapper {
-    max-height: 320px;
-    overflow-y: auto;
-    border-radius: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
 }
 
 /* ===============================
    TABLE BASE
 ================================ */
 #taskTable {
+    border-collapse: collapse;
     width: 100%;
-    border-collapse: collapse;   /* Important */
+    min-width: 1900px;   /* Forces horizontal scroll */
+    border-collapse: collapse;
     font-size: 14px;
 }
 
 /* ===============================
-   HEADER STYLE (CLEARLY DIFFERENT)
+   STICKY HEADER
 ================================ */
 #taskTable thead {
-    background: #1e293b;   /* Dark header */
+    background: #1e293b;   /* your old dark header */
 }
 
 #taskTable thead th {
@@ -127,6 +154,7 @@ header h1 {
     letter-spacing: 0.5px;
     padding: 14px 15px;
     text-align: left;
+    z-index: 5;
 }
 
 /* ===============================
@@ -138,61 +166,39 @@ header h1 {
 }
 
 #taskTable tbody td {
-    padding: 14px 15px;
+    padding: 13px 15px;
     color: #374151;
+    white-space: nowrap;
 }
 
 /* ===============================
-   HOVER EFFECT (CLEAN)
+   ROW HOVER EFFECT
 ================================ */
 #taskTable tbody tr:hover {
     background: #f1f5f9;
 }
 
 /* ===============================
-   SCROLLBAR
+   STATUS BADGE STYLE (Optional Upgrade)
 ================================ */
-.table-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.table-wrapper {
-    max-height: 400px;       /* Vertical scroll */
-    overflow-y: auto;
-    overflow-x: auto;        /* Horizontal scroll */
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}
-
-#taskTable {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 1800px;       /* Force horizontal scroll */
-}
-
-#taskTable thead {
-    position: sticky;
-    top: 0;
-    background-color: #1f2a40;
-    color: white;
-    z-index: 10;
-}
-
-#taskTable th {
-    padding: 12px;
-    text-align: left;
+.status-live {
+    color: #059669;
     font-weight: 600;
-    font-size: 14px;
 }
 
-#taskTable td {
-    padding: 10px;
-    font-size: 13px;
-    border-bottom: 1px solid #eee;
+.status-uat {
+    color: #2563eb;
+    font-weight: 600;
 }
 
-#taskTable tbody tr:hover {
-    background-color: #f5f7fa;
+.status-wip {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.status-done {
+    color: #7c3aed;
+    font-weight: 600;
 }
 
 .charts {

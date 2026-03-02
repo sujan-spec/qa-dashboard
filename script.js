@@ -17,13 +17,22 @@ async function loadData() {
 
         // ✅ Correct Column Mapping Based On Your Sheet
         allData = rows.map(row => ({
-            qa: row.c[0]?.v?.toString().trim() || "",
-            jira: row.c[1]?.v?.toString().trim() || "",
-            type: row.c[2]?.v?.toString().trim() || "",
-            dev: row.c[3]?.v?.toString().trim() || "",
-            priority: row.c[4]?.v?.toString().trim() || "",
-            complexity: row.c[5]?.v?.toString().trim() || "",
-            status: row.c[6]?.v?.toString().trim() || ""
+            qa: row.c[0]?.v || "",
+            jira: row.c[1]?.v || "",
+            relatedJira: row.c[2]?.v || "",
+            type: row.c[3]?.v || "",
+            status: row.c[4]?.v || "",
+            etaSujan: row.c[5]?.v || "",
+            etaAssignee: row.c[6]?.v || "",
+            jiraLink: row.c[7]?.v || "",
+            developer: row.c[8]?.v || "",
+            priority: row.c[9]?.v || "",
+            complexity: row.c[10]?.v || "",
+            qaRelease: formatDate(row.c[11]?.v),
+            clientRelease: formatDate(row.c[12]?.v),
+            buildQA: row.c[13]?.v || "",
+            remarks: row.c[14]?.v || ""
+
         }));
 
         applyFilters();
@@ -31,6 +40,33 @@ async function loadData() {
     } catch (error) {
         console.error("Error loading data:", error);
     }
+}
+
+
+function formatDate(value) {
+    if (!value) return "";
+
+    // If already normal string (like from text column)
+    if (typeof value === "string" && !value.startsWith("Date(")) {
+        return value;
+    }
+
+    // Convert Date(2026,1,17) format
+    const match = value.match(/Date\((\d+),(\d+),(\d+)\)/);
+
+    if (!match) return value;
+
+    const year = parseInt(match[1]);
+    const month = parseInt(match[2]);
+    const day = parseInt(match[3]);
+
+    const date = new Date(year, month, day);
+
+    return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
 }
 
 /* =========================
@@ -71,33 +107,41 @@ function updateDashboard(data) {
     const tbody = document.querySelector("#taskTable tbody");
 tbody.innerHTML = "";
 
+if (!data || data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="15" style="text-align:center;padding:20px;">
+                    No Data Available
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
 data.forEach(task => {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-        <td>${task["QA"] || "-"}</td>
-            <td>${task["Jira"] || "-"}</td>
-            <td>${task["Related Jira ID"] || "-"}</td>
-            <td>${task["Task Type"] || "-"}</td>
-            <td>${task["Status"] || "-"}</td>
-            <td>${task["QA ETA(Hrs)[Given by SUJAN]"] || "-"}</td>
-            <td>${task["QA ETA(Hrs)[Given by Assignee]"] || "-"}</td>
-            <td>
-                ${task["Internal Jira Link"] 
-                    ? `<a href="${task["Internal Jira Link"]}" target="_blank">View</a>` 
-                    : "-"}
-            </td>
-            <td>${task["Developer"] || "-"}</td>
-            <td>${task["Priority"] || "-"}</td>
-            <td>${task["Complexity"] || "-"}</td>
-            <td>${task["QA Release Date"] || "-"}</td>
-            <td>${task["Client Release Date"] || "-"}</td>
-            <td>${task["Released Build for QA"] || "-"}</td>
-            <td>${task["Remarks/Blocker (if any)"] || "-"}</td>
-    `;
+    <td>${task.qa || "-"}</td>
+            <td>${task.jira || "-"}</td>
+            <td>${task.relatedJira || "-"}</td>
+            <td>${task.type || "-"}</td>
+            <td>${task.status || "-"}</td>
+            <td>${task.etaSujan || "-"}</td>
+            <td>${task.etaAssignee || "-"}</td>
+            <td>${task.jiraLink ? "View" : "-"}</td>
+            <td>${task.developer || "-"}</td>
+            <td>${task.priority || "-"}</td>
+            <td>${task.complexity || "-"}</td>
+            <td>${task.qaRelease || "-"}</td>
+            <td>${task.clientRelease || "-"}</td>
+            <td>${task.buildQA || "-"}</td>
+            <td>${task.remarks || "-"}</td>
+`;
 
     tbody.appendChild(tr);
 });
+
 
     // ✅ Summary Cards
     document.getElementById("totalTasks").innerText = data.length;
