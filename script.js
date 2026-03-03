@@ -36,7 +36,7 @@ function formatDate(value) {
 }
 
 /* =========================
-   LOAD DATA (Dynamic Sheet)
+   LOAD DATA (Dynamic Sheet):
 ========================= */
 async function loadData(sheetName = "") {
 
