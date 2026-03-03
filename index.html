@@ -8,10 +8,28 @@
 
 <body>
 
-    <header>
+    <header class="header-container">
+    <div class="header-left">
         <h1>QA Activity Dashboard</h1>
         <p>Daily QA Tracking & Visualization</p>
-    </header>
+        <p id="currentSprint" class="sprint-label"></p>
+    </div>
+
+    <div class="header-right">
+        <select id="sheetSelector" class="sprint-dropdown"></select>
+    </div>
+</header>
+    
+
+<!-- ===============================
+     GLOBAL LOADER
+================================ -->
+<div id="globalLoader" class="loader-overlay">
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <p>Loading Sprint Data...</p>
+    </div>
+</div>
 
     <section class="summary">
         <div class="card">
@@ -61,28 +79,31 @@
     </section>
 
     <section class="filters">
-        <input type="text" id="searchInput" placeholder="Search Jira ID">
 
-        <select id="qaFilter">
-            <option value="">All QA</option>
-            <option>Adarsh</option>
-            <option>Arpita</option>
-            <option>Mamata</option>
-            <option>Soudip</option>
-            <option>Sujan</option>
-        </select>
 
-        <select id="statusFilter">
-            <option value="">All Status</option>
-            <option>LIVE</option>
-            <option>UAT</option>
-            <option>WIP</option>
-            <option>DONE</option>
-        </select>
 
-        <button onclick="applyFilters()">Apply Filter</button>
-        <button id="refreshBtn">Refresh</button>
-    </section>
+    <input type="text" id="searchInput" placeholder="Search Jira ID">
+
+    <select id="qaFilter">
+        <option value="">All QA</option>
+        <option>Adarsh</option>
+        <option>Arpita</option>
+        <option>Mamata</option>
+        <option>Soudip</option>
+        <option>Sujan</option>
+    </select>
+
+    <select id="statusFilter">
+        <option value="">All Status</option>
+        <option>LIVE</option>
+        <option>UAT</option>
+        <option>WIP</option>
+        <option>DONE</option>
+    </select>
+
+    <button onclick="applyFilters()">Apply Filter</button>
+    <button id="refreshBtn">Refresh</button>
+</section>
 
     <section class="table-section">
     <div class="table-top-bar">

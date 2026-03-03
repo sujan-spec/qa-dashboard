@@ -1,38 +1,74 @@
-const SHEET_ID = "1B1cwUPkMjnDnH9LWM014qTcDG7-SdP3lnWViI9b05pY";
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+let sprintCache = {};
+let availableSheets = [];
+let currentSprint = "";
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzKR0sBQTmD9XIU3n-e7SC29UiLQxLVkGEqsQVhipW-nKsfnBDQezUUH80YiT6_VPdj/exec";
 
 let allData = [];
 let chart;
 
+function showLoader() {
+    document.getElementById("globalLoader").style.display = "flex";
+    document.getElementById("sheetSelector").disabled = true;
+}
+
+function hideLoader() {
+    document.getElementById("globalLoader").style.display = "none";
+    document.getElementById("sheetSelector").disabled = false;
+}
+
 /* =========================
-   LOAD DATA FROM GOOGLE SHEET
+   FORMAT DATE FUNCTION
 ========================= */
-async function loadData() {
+function formatDate(value) {
+
+    if (!value) return "";
+
+    const date = new Date(value);
+
+    if (isNaN(date)) return value;
+
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+/* =========================
+   LOAD DATA (Dynamic Sheet)
+========================= */
+async function loadData(sheetName = "") {
+
     try {
-        const response = await fetch(SHEET_URL);
-        const text = await response.text();
+        const url = sheetName
+            ? `${API_URL}?sheet=${sheetName}`
+            : API_URL;
 
-        const json = JSON.parse(text.substring(47).slice(0, -2));
-        const rows = json.table.rows;
+        const response = await fetch(url);
+        const result = await response.json();
 
-        // ✅ Correct Column Mapping Based On Your Sheet
-        allData = rows.map(row => ({
-            qa: row.c[0]?.v || "",
-            jira: row.c[1]?.v || "",
-            relatedJira: row.c[2]?.v || "",
-            type: row.c[3]?.v || "",
-            status: row.c[4]?.v || "",
-            etaSujan: row.c[5]?.v || "",
-            etaAssignee: row.c[6]?.v || "",
-            jiraLink: row.c[7]?.v || "",
-            developer: row.c[8]?.v || "",
-            priority: row.c[9]?.v || "",
-            complexity: row.c[10]?.v || "",
-            qaRelease: formatDate(row.c[11]?.v),
-            clientRelease: formatDate(row.c[12]?.v),
-            buildQA: row.c[13]?.v || "",
-            remarks: row.c[14]?.v || ""
+        populateSheetDropdown(result.sheets, result.currentSheet);
 
+        // ✅ Show Current Sprint Name
+        document.getElementById("currentSprint").innerText = "Current Sprint: " + result.currentSheet;
+
+        allData = result.data.map(row => ({
+            qa: row[0] || "",
+            jira: row[1] || "",
+            relatedJira: row[2] || "",
+            type: row[3] || "",
+            status: row[4] || "",
+            etaSujan: row[5] || "",
+            etaAssignee: row[6] || "",
+            jiraLink: row[7] || "",
+            developer: row[8] || "",
+            priority: row[9] || "",
+            complexity: row[10] || "",
+            qaRelease: formatDate(row[11]),
+            clientRelease: formatDate(row[12]),
+            buildQA: row[13] || "",
+            remarks: row[14] || ""
         }));
 
         applyFilters();
@@ -42,32 +78,68 @@ async function loadData() {
     }
 }
 
+/* =========================
+   SHEET DROPDOWN
+========================= */
+function populateSheetDropdown(sheets, selectedSheet) {
 
-function formatDate(value) {
-    if (!value) return "";
+    const dropdown = document.getElementById("sheetSelector");
+    dropdown.innerHTML = "";
 
-    // If already normal string (like from text column)
-    if (typeof value === "string" && !value.startsWith("Date(")) {
-        return value;
+    sheets.forEach(sheet => {
+        const option = document.createElement("option");
+        option.value = sheet;
+        option.textContent = sheet;
+        dropdown.appendChild(option);
+    });
+
+    dropdown.value = selectedSheet;
+}
+
+document.getElementById("sheetSelector").addEventListener("change", async function () {
+
+    const selected = this.value;
+
+    localStorage.setItem("selectedSprint", selected);
+
+    showLoader();  // 🔥 Show loader immediately
+
+    try {
+        const response = await fetch(API_URL + "?sheet=" + selected);
+        const result = await response.json();
+
+        currentSprint = selected;
+
+        document.getElementById("currentSprint").innerText =
+            "Sprint: " + selected;
+
+        const formattedData = result.data.map(row => ({
+            qa: row[0] || "",
+            jira: row[1] || "",
+            relatedJira: row[2] || "",
+            type: row[3] || "",
+            status: row[4] || "",
+            etaSujan: row[5] || "",
+            etaAssignee: row[6] || "",
+            jiraLink: row[7] || "",
+            developer: row[8] || "",
+            priority: row[9] || "",
+            complexity: row[10] || "",
+            qaRelease: row[11] || "",
+            clientRelease: row[12] || "",
+            buildQA: row[13] || "",
+            remarks: row[14] || ""
+        }));
+
+        allData = formattedData;
+        applyFilters();
+
+    } catch (error) {
+        console.error("Error switching sprint:", error);
     }
 
-    // Convert Date(2026,1,17) format
-    const match = value.match(/Date\((\d+),(\d+),(\d+)\)/);
-
-    if (!match) return value;
-
-    const year = parseInt(match[1]);
-    const month = parseInt(match[2]);
-    const day = parseInt(match[3]);
-
-    const date = new Date(year, month, day);
-
-    return date.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-    });
-}
+    hideLoader(); // 🔥 Hide loader after everything
+});
 
 /* =========================
    APPLY FILTERS
@@ -84,16 +156,11 @@ function applyFilters() {
         const qa = task.qa.toLowerCase();
         const status = task.status.toLowerCase();
 
-        const matchSearch =
-            searchValue === "" || jira.includes(searchValue);
-
-        const matchQA =
-            qaValue === "" || qa.includes(qaValue);
-
-        const matchStatus =
-            statusValue === "" || status === statusValue;
-
-        return matchSearch && matchQA && matchStatus;
+        return (
+            (!searchValue || jira.includes(searchValue)) &&
+            (!qaValue || qa.includes(qaValue)) &&
+            (!statusValue || status === statusValue)
+        );
     });
 
     updateDashboard(filteredData);
