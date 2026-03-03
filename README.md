@@ -24,3 +24,13 @@ Date formatting and reporting view
 Clean UI with responsive layout
 Loader while fetching sprint data
 Latest sprint auto-selection logic
+
+📊 Use Case:
+This dashboard simulates real-world QA reporting used in Agile sprint cycles for:
+Sprint health tracking
+Release readiness evaluation
+Stakeholder reporting
+Defect trend visibility
+
+🔐 Note:
+This is a demo project created for learning and portfolio purposes.
