@@ -2,7 +2,7 @@ let sprintCache = {};
 let availableSheets = [];
 let currentSprint = "";
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzKR0sBQTmD9XIU3n-e7SC29UiLQxLVkGEqsQVhipW-nKsfnBDQezUUH80YiT6_VPdj/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwR0ujItNOYvscIbZlGAC6gTqgFcHoIjTg4jXRB2rUkogK4VAhirbpBKiFbD1D9gHHj/exec";
 
 let allData = [];
 let chart;
@@ -51,7 +51,7 @@ async function loadData(sheetName = "") {
         populateSheetDropdown(result.sheets, result.currentSheet);
 
         // ✅ Show Current Sprint Name
-        document.getElementById("currentSprint").innerText = "Current Sprint: " + result.currentSheet;
+        document.getElementById("currentSprint").innerText = "Sprint: " + result.currentSheet;
 
         allData = result.data.map(row => ({
             qa: row[0] || "",
@@ -189,7 +189,7 @@ data.forEach(task => {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-    <td>${task.qa || "-"}</td>
+            <td>${task.qa || "-"}</td>
             <td>${task.jira || "-"}</td>
             <td>${task.relatedJira || "-"}</td>
             <td>${task.type || "-"}</td>
@@ -225,17 +225,33 @@ data.forEach(task => {
     document.getElementById("p4Tasks").innerText =
         data.filter(t => t.priority.toLowerCase() === "p4").length;
 
-    document.getElementById("liveTasks").innerText =
-        data.filter(t => t.status.toLowerCase() === "live").length;
-
     document.getElementById("doneTasks").innerText =
         data.filter(t => t.status.toLowerCase() === "done").length;
+
+    document.getElementById("pendingqaTasks").innerText =
+        data.filter(t => t.status.toLowerCase() === "pending-qa").length;
 
     document.getElementById("uatTasks").innerText =
         data.filter(t => t.status.toLowerCase() === "uat").length;
 
     document.getElementById("notstartedTasks").innerText =
         data.filter(t => t.status.toLowerCase() === "not started").length;
+
+    // // Count Production Bugs
+    // const productionBugs = data.filter(t => t.type && t.type.toLowerCase() === "production-bug").length;
+
+    // // Count UAT Bugs
+    // const uatBugs = data.filter(t => t.type && t.type.toLowerCase() === "uat-bug").length;
+
+    // // Show individual counts
+    // document.getElementById("productionBugs").innerText = productionBugs;
+    // document.getElementById("uatBugs").innerText = uatBugs;
+
+    // // Calculate total
+    // const totalBugs = productionBugs + uatBugs;
+
+    // // Show total
+    // document.getElementById("totalBugs").innerText = totalBugs;
 
     updateChart(data);
 }
@@ -273,8 +289,13 @@ function updateChart(data) {
         featureCounts.push(featureSum);
 
         // 3️⃣ Bug
-        const bugSum = qaTasks.filter(t =>
-            t.type.toLowerCase() === "bug"
+        const bugSum = qaTasks.filter(t => {
+            const type = t.type.toLowerCase();
+            return (
+                type === "production-bug" ||
+                type === "uat-bug"
+            );
+        }
         ).length;
 
         bugCounts.push(bugSum);
@@ -339,7 +360,7 @@ function updateChart(data) {
 }
 
 // Button click
-document.querySelector("button").addEventListener("click", applyFilters);
+document.getElementById("applyFilterBtn").addEventListener("click", applyFilters);
 
 // ===============================
 // REFRESH BUTTON FUNCTIONALITY
@@ -374,24 +395,51 @@ document.getElementById("exportBtn").addEventListener("click", () => {
         return matchSearch && matchQA && matchStatus;
     });
 
+    // ✅ Define CSV first
     let csv = "QA,Jira,Related Jira,Task Type,Status,QA ETA(Sujan),QA ETA(Assignee),Developer,Priority,Complexity,QA Release,Client Release,Build QA,Remarks\n";
 
+    // ✅ Build rows
     filteredData.forEach(task => {
-        csv += `"${task.qa}","${task.jira}","${task.relatedJira}","${task.type}","${task.status}",
-"${task.etaSujan}","${task.etaAssignee}","${task.developer}","${task.priority}",
-"${task.complexity}","${task.qaRelease}","${task.clientRelease}",
-"${task.buildQA}","${task.remarks}"\n`;
+
+        const row = [
+            task.qa || "",
+            task.jira || "",
+            task.relatedJira || "",
+            task.type || "",
+            task.status || "",
+            task.etaSujan || "",
+            task.etaAssignee || "",
+            task.developer || "",
+            task.priority || "",
+            task.complexity || "",
+            task.qaRelease || "",
+            task.clientRelease || "",
+            task.buildQA || "",
+            task.remarks || ""
+        ];
+
+        csv += `"${row.join('","')}"\n`;
     });
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    // ✅ Fix Excel UTF issue
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "QA_Daily_Activity.csv";
+    // ✅ Get Sprint Name
+    const sprintName = document.getElementById("sheetSelector").value || "Sprint";
+    // ✅ Get Today Date
+    const today = new Date();
+    const formattedDate =
+        String(today.getDate()).padStart(2, '0') + "-" +
+        String(today.getMonth() + 1).padStart(2, '0') + "-" +
+        today.getFullYear();
+    a.download = `QA_Activity_${sprintName}_${formattedDate}.csv`;
     a.click();
 
     window.URL.revokeObjectURL(url);
+
 });
 
 /* =========================

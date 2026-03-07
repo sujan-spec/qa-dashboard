@@ -59,12 +59,12 @@
 
         <div class="card">
             <h3>LIVE Releases</h3>
-            <p id="liveTasks">0</p>
+            <p id="doneTasks">0</p>
         </div>
 
         <div class="card">
-            <h3>DONE</h3>
-            <p id="doneTasks">0</p>
+            <h3>Pending-QA</h3>
+            <p id="pendingqaTasks">0</p>
         </div>
 
         <div class="card">
@@ -76,6 +76,23 @@
             <h3>Not Started</h3>
             <p id="notstartedTasks">0</p>
         </div>
+    
+    <!--
+        <div class="card">
+            <h3>Production-Bug</h3>
+            <p id="productionBugs">0</p>
+        </div>
+
+        <div class="card">
+            <h3>UAT-Bug</h3>
+            <p id="uatBugs">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Total-Bug</h3>
+            <p id="totalBugs">0</p>
+        </div>
+    -->
     </section>
 
     <section class="filters">
@@ -101,13 +118,13 @@
         <option>DONE</option>
     </select>
 
-    <button onclick="applyFilters()">Apply Filter</button>
+    <button id="applyFilterBtn">Apply Filter</button>
     <button id="refreshBtn">Refresh</button>
 </section>
 
     <section class="table-section">
     <div class="table-top-bar">
-        <h2>Daily Activity</h2>
+        <h2>Sprint Activity</h2>
         <button id="exportBtn">Export CSV</button>
     </div>
     
