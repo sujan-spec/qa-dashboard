@@ -49,6 +49,7 @@ async function loadData(sheetName = "") {
         const result = await response.json();
 
         populateSheetDropdown(result.sheets, result.currentSheet);
+        populateComparisonSprints(result.sheets);
 
         // ✅ Show Current Sprint Name
         document.getElementById("currentSprint").innerText = "Sprint: " + result.currentSheet;
@@ -94,6 +95,23 @@ function populateSheetDropdown(sheets, selectedSheet) {
     });
 
     dropdown.value = selectedSheet;
+}
+
+function populateComparisonSprints(sheets){
+
+    const s1 = document.getElementById("comparisonSprint1");
+    const s2 = document.getElementById("comparisonSprint2");
+    const s3 = document.getElementById("comparisonSprint3");
+
+    [s1,s2,s3].forEach(select=>{
+        select.innerHTML="";
+        sheets.forEach(sheet=>{
+            const opt=document.createElement("option");
+            opt.value=sheet;
+            opt.textContent=sheet;
+            select.appendChild(opt);
+        });
+    });
 }
 
 document.getElementById("sheetSelector").addEventListener("change", async function () {
@@ -196,7 +214,7 @@ data.forEach(task => {
             <td>${task.status || "-"}</td>
             <td>${task.etaSujan || "-"}</td>
             <td>${task.etaAssignee || "-"}</td>
-            <td>${task.jiraLink ? "View" : "-"}</td>
+            <td>${task.jiraLink ? `<a href="${task.jiraLink}" target="_blank">View</a>` : "-"}</td>
             <td>${task.developer || "-"}</td>
             <td>${task.priority || "-"}</td>
             <td>${task.complexity || "-"}</td>
@@ -441,6 +459,299 @@ document.getElementById("exportBtn").addEventListener("click", () => {
     window.URL.revokeObjectURL(url);
 
 });
+
+// TAB SWITCHING
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        document.querySelectorAll(".chart-tab-content")
+        .forEach(tab=>tab.classList.remove("active"));
+
+        const tabName=btn.dataset.tab;
+
+        if(tabName==="visualization"){
+            document.getElementById("visualizationTab").classList.add("active");
+        }
+        else{
+            document.getElementById("comparisonTab").classList.add("active");
+        }
+
+    });
+
+});
+
+let comparisonChart;
+
+document.getElementById("compareBtn").addEventListener("click", async ()=>{
+
+    const qa = document.getElementById("comparisonQA").value;
+
+    const sprints = [
+        document.getElementById("comparisonSprint1").value,
+        document.getElementById("comparisonSprint2").value,
+        document.getElementById("comparisonSprint3").value
+    ].filter(Boolean);
+
+    if(!sprints.length) return;
+
+    const sprintTotals=[];
+
+    for(const sprint of sprints){
+
+        const response = await fetch(API_URL + "?sheet=" + sprint);
+        const result = await response.json();
+
+        let data=result.data;
+
+        if(qa){
+            data=data.filter(r=>r[0]===qa);
+        }
+
+        sprintTotals.push(data.length);
+    }
+
+    const ctx=document.getElementById("comparisonChart").getContext("2d");
+
+    if(comparisonChart) comparisonChart.destroy();
+
+    comparisonChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+            labels:sprints,
+            datasets:[
+                {
+                    label: qa ? qa+" Tasks" : "Total Tasks",
+                    data:sprintTotals,
+                    backgroundColor:"#2563eb",
+                    borderRadius:6
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            scales:{
+                y:{beginAtZero:true}
+            }
+        }
+    });
+
+});
+
+/* =========================
+   SPRINT COMPARISON LOGIC
+========================= */
+
+const sprintDropdowns = [
+    document.getElementById("sprint1"),
+    document.getElementById("sprint2"),
+    document.getElementById("sprint3")
+];
+
+const compareBtn = document.getElementById("compareBtn");
+const compareLoader = document.getElementById("compareLoader");
+
+let comparisonSprintChart;
+
+
+/* =========================
+   POPULATE SPRINT DROPDOWNS
+========================= */
+
+function populateComparisonSprints(sprints) {
+
+    sprintDropdowns.forEach(dropdown => {
+
+        dropdown.innerHTML = '<option value="">Select Sprint</option>';
+
+        sprints.forEach(sprint => {
+
+            const option = document.createElement("option");
+
+            option.value = sprint;
+            option.textContent = sprint;
+
+            dropdown.appendChild(option);
+
+        });
+
+    });
+
+}
+
+
+/* =========================
+   PREVENT DUPLICATE SPRINTS
+========================= */
+
+function updateSprintOptions() {
+
+    const selected = sprintDropdowns.map(d => d.value);
+
+    sprintDropdowns.forEach(dropdown => {
+
+        const options = dropdown.querySelectorAll("option");
+
+        options.forEach(opt => {
+
+            if (opt.value === "") return;
+
+            if (selected.includes(opt.value) && dropdown.value !== opt.value) {
+                opt.disabled = true;
+            } else {
+                opt.disabled = false;
+            }
+
+        });
+
+    });
+
+}
+
+sprintDropdowns.forEach(dropdown => {
+    dropdown.addEventListener("change", updateSprintOptions);
+});
+
+
+/* =========================
+   COMPARE BUTTON LOGIC
+========================= */
+document.getElementById("compareBtn").addEventListener("click", async function () {
+
+    const button = document.getElementById("compareBtn");
+    const overlay = document.getElementById("chartOverlay");
+
+    const selectedSprints = sprintDropdowns
+        .map(d => d.value)
+        .filter(v => v !== "");
+
+    if (selectedSprints.length === 0) {
+        alert("Please select at least one sprint");
+        return;
+    }
+
+    // disable button
+    button.disabled = true;
+    button.style.opacity = "0.6";
+    button.style.cursor = "not-allowed";
+
+    // show loader
+    overlay.style.display = "block";
+
+    try {
+        await renderComparisonChart();
+    } catch (error) {
+        console.error(error);
+        alert("Error loading comparison chart");
+    }
+
+    // hide loader
+    overlay.style.display = "none";
+
+    // enable button again
+    button.disabled = false;
+    button.style.opacity = "1";
+    button.style.cursor = "pointer";
+
+});
+
+/* =========================
+   BUILD CHART DATA
+========================= */
+async function renderComparisonChart() {
+
+    const selectedQA = document.getElementById("comparisonQA").value;
+
+    const selectedSprints = sprintDropdowns
+        .map(d => d.value)
+        .filter(v => v !== "");
+
+    const labels = [];
+    const totalTasks = [];
+    const workItems = [];
+    const bugs = [];
+
+    for (const sprint of selectedSprints) {
+
+        const response = await fetch(API_URL + "?sheet=" + sprint);
+        const result = await response.json();
+
+        let data = result.data.map(row => ({
+            qa: row[0] || "",
+            type: row[3] || ""
+        }));
+
+        if (selectedQA) {
+            data = data.filter(d => d.qa === selectedQA);
+        }
+
+        const total = data.length;
+
+        const featureCount = data.filter(d => {
+            const type = d.type.toLowerCase();
+            return (
+                type === "enhancement" ||
+                type === "task" ||
+                type === "epic" ||
+                type === "story" ||
+                type === "new feature"
+            );
+        }).length;
+
+        const bugCount = data.filter(d => {
+            const type = d.type.toLowerCase();
+            return (
+                type === "production-bug" ||
+                type === "uat-bug"
+            );
+        }).length;
+
+        labels.push(sprint);
+        totalTasks.push(total);
+        workItems.push(featureCount);
+        bugs.push(bugCount);
+    }
+
+    const ctx = document.getElementById("comparisonChart").getContext("2d");
+
+    if (comparisonSprintChart) comparisonSprintChart.destroy();
+
+    comparisonSprintChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Total Tasks",
+                    data: totalTasks,
+                    backgroundColor: "#374151"
+                },
+                {
+                    label: "Enhancement+Task+Epic+Story+New Feature",
+                    data: workItems,
+                    backgroundColor: "#16a34a"
+                },
+                {
+                    label: "Bug",
+                    data: bugs,
+                    backgroundColor: "#dc2626"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+}      
 
 /* =========================
    INITIAL LOAD

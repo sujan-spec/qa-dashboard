@@ -311,3 +311,109 @@ header h1 {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
+
+.chart-tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tab-btn{
+    padding:8px 16px;
+    border:none;
+    border-radius:6px;
+    background:#e5e7eb;
+    cursor:pointer;
+    font-weight:500;
+}
+
+.tab-btn.active{
+    background:#1e3c72;
+    color:white;
+}
+
+.chart-tab-content{
+    display:none;
+}
+
+.chart-tab-content.active{
+    display:block;
+}
+
+.comparison-controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
+}
+
+.comparison-controls select,
+.comparison-controls button{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+#compareBtn{
+    background:#1e3c72;
+    color:white;
+    border:none;
+    cursor: pointer;
+}
+
+.comparison-section {
+    margin-top: 20px;
+}
+
+.comparison-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.comparison-chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* overlay covering chart */
+.chart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(255,255,255,0.9);
+
+    display: none;
+    z-index: 20;
+}
+
+/* center content */
+.loader-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* spinner */
+.spinner2 {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

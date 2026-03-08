@@ -95,19 +95,87 @@
     -->
     </section>
 
+    <section class="charts">
+
+    <div class="chart-tabs">
+
+        <button class="tab-btn active" data-tab="visualization">
+            Sprint Visualization
+        </button>
+
+        <button class="tab-btn" data-tab="comparison">
+            Sprint Comparison
+        </button>
+
+    </div>
+
+    <!-- Sprint Visualization -->
+    <div id="visualizationTab" class="chart-tab-content active">
+
+        <div class="chart-container">
+            <canvas id="qaChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Sprint Comparison -->
+    <div id="comparisonTab" class="chart-tab-content">
+
+        <div class="comparison-controls">
+
+            <label>Select QA:</label>
+            <select id="comparisonQA">
+                <option value="">All QA</option>
+                <option>John Doe</option>
+                <option>Jane Smith</option>
+                <option>Alex Johnson</option>
+                <option>Michael Brown</option>
+                <option>Emily Davis</option>
+            </select>
+
+            <label>Select Sprints:</label>
+            <select id="sprint1">
+                <option value="">Select Sprint</option>
+            </select>
+
+            <select id="sprint2">
+                <option value="">Select Sprint</option>
+            </select>
+
+            <select id="sprint3">
+                <option value="">Select Sprint</option>
+            </select>
+
+            <button id="compareBtn">Compare</button>
+
+        </div>
+
+        <div class="comparison-chart-container">
+
+            <canvas id="comparisonChart"></canvas>
+
+            <div id="chartOverlay" class="chart-overlay">
+                <div class="loader-box">
+                    <div class="spinner2"></div>
+                    <p>Loading sprint comparison...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
     <section class="filters">
-
-
-
     <input type="text" id="searchInput" placeholder="Search Jira ID">
 
     <select id="qaFilter">
         <option value="">All QA</option>
-        <option>Adarsh</option>
-        <option>Arpita</option>
-        <option>Mamata</option>
-        <option>Soudip</option>
-        <option>Sujan</option>
+        <option>John Doe</option>
+        <option>Jane Smith</option>
+        <option>Alex Johnson</option>
+        <option>Michael Brown</option>
+        <option>Emily Davis</option>
     </select>
 
     <select id="statusFilter">
@@ -154,13 +222,6 @@
         </table>
     </div>
 </section>
-
-    <section class="charts">
-        <h2>Visualization</h2>
-        <div class="chart-container">
-            <canvas id="qaChart"></canvas>
-        </div>
-    </section>
 
 
 <script src="script.js"></script>
