@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>QA Activity Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -155,7 +156,7 @@
             <canvas id="comparisonChart"></canvas>
 
             <div id="chartOverlay" class="chart-overlay">
-                <div class="loader-box">
+                <div class="loader-box2">
                     <div class="spinner2"></div>
                     <p>Loading sprint comparison...</p>
                 </div>
@@ -201,26 +202,41 @@
         <table id="taskTable">
             <thead>
                 <tr>
-                <th>QA</th>
-                <th>Jira</th>
-                <th>Related Jira ID</th>
-                <th>Task Type</th>
-                <th>Status</th>
-                <th>QA ETA(Hrs)[Given by SUJAN]</th>
-                <th>QA ETA(Hrs)[Given by Assignee]</th>
-                <th>Internal Jira Link</th>
-                <th>Developer</th>
-                <th>Priority</th>
-                <th>Complexity</th>
-                <th>QA Release Date</th>
-                <th>Client Release Date</th>
-                <th>Released Build for QA</th>
-                <th>Remarks/Blocker (if any)</th>
+                    <th>S.No</th>
+                    <th>QA</th>
+                    <th>Jira</th>
+                    <th>Related Jira ID</th>
+                    <th>Task Type</th>
+                    <th>Status</th>
+                    <th>QA ETA(Hrs)[Given by JOHN]</th>
+                    <th>QA ETA(Hrs)[Given by Assignee]</th>
+                    <th>Internal Jira Link</th>
+                    <th>Developer</th>
+                    <th>Priority</th>
+                    <th>Complexity</th>
+                    <th>QA Release Date</th>
+                    <th>Client Release Date</th>
+                    <th>Released Build for QA</th>
+                    <th>Remarks/Blocker (if any)</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
+
+    <div class="table-footer">
+
+    <div id="recordInfo" class="record-info">
+        Showing 0-0 of 0 records
+    </div>
+
+    <div class="pagination">
+        <button id="prevPage">Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button id="nextPage">Next</button>
+    </div>
+
+</div>
 </section>
 
 

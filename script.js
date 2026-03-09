@@ -4,6 +4,8 @@ let currentSprint = "";
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwR0ujItNOYvscIbZlGAC6gTqgFcHoIjTg4jXRB2rUkogK4VAhirbpBKiFbD1D9gHHj/exec";
 
+let currentPage = 1;
+const rowsPerPage = 25;
 let allData = [];
 let chart;
 
@@ -99,9 +101,9 @@ function populateSheetDropdown(sheets, selectedSheet) {
 
 function populateComparisonSprints(sheets){
 
-    const s1 = document.getElementById("comparisonSprint1");
-    const s2 = document.getElementById("comparisonSprint2");
-    const s3 = document.getElementById("comparisonSprint3");
+    const s1 = document.getElementById("sprint1");
+    const s2 = document.getElementById("sprint2");
+    const s3 = document.getElementById("sprint3");
 
     [s1,s2,s3].forEach(select=>{
         select.innerHTML="";
@@ -163,6 +165,7 @@ document.getElementById("sheetSelector").addEventListener("change", async functi
    APPLY FILTERS
 ========================= */
 function applyFilters() {
+    currentPage = 1;
 
     const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
     const qaValue = document.getElementById("qaFilter").value.toLowerCase().trim();
@@ -189,8 +192,12 @@ function applyFilters() {
 ========================= */
 function updateDashboard(data) {
 
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedData = data.slice(start, end);
+
     const tbody = document.querySelector("#taskTable tbody");
-tbody.innerHTML = "";
+    tbody.innerHTML = "";
 
 if (!data || data.length === 0) {
         tbody.innerHTML = `
@@ -203,10 +210,11 @@ if (!data || data.length === 0) {
         return;
     }
 
-data.forEach(task => {
+paginatedData.forEach((task, index) => {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
+            <td>${start + index + 1}</td>
             <td>${task.qa || "-"}</td>
             <td>${task.jira || "-"}</td>
             <td>${task.relatedJira || "-"}</td>
@@ -225,6 +233,7 @@ data.forEach(task => {
 `;
 
     tbody.appendChild(tr);
+    updatePagination(data.length);
 });
 
 
@@ -484,64 +493,6 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
 
 });
 
-let comparisonChart;
-
-document.getElementById("compareBtn").addEventListener("click", async ()=>{
-
-    const qa = document.getElementById("comparisonQA").value;
-
-    const sprints = [
-        document.getElementById("comparisonSprint1").value,
-        document.getElementById("comparisonSprint2").value,
-        document.getElementById("comparisonSprint3").value
-    ].filter(Boolean);
-
-    if(!sprints.length) return;
-
-    const sprintTotals=[];
-
-    for(const sprint of sprints){
-
-        const response = await fetch(API_URL + "?sheet=" + sprint);
-        const result = await response.json();
-
-        let data=result.data;
-
-        if(qa){
-            data=data.filter(r=>r[0]===qa);
-        }
-
-        sprintTotals.push(data.length);
-    }
-
-    const ctx=document.getElementById("comparisonChart").getContext("2d");
-
-    if(comparisonChart) comparisonChart.destroy();
-
-    comparisonChart=new Chart(ctx,{
-        type:"bar",
-        data:{
-            labels:sprints,
-            datasets:[
-                {
-                    label: qa ? qa+" Tasks" : "Total Tasks",
-                    data:sprintTotals,
-                    backgroundColor:"#2563eb",
-                    borderRadius:6
-                }
-            ]
-        },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            scales:{
-                y:{beginAtZero:true}
-            }
-        }
-    });
-
-});
-
 /* =========================
    SPRINT COMPARISON LOGIC
 ========================= */
@@ -751,7 +702,38 @@ async function renderComparisonChart() {
         }
     });
 
-}      
+}
+
+//Pagination Logic//
+function updatePagination(totalRows){
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+    const start = (currentPage - 1) * rowsPerPage + 1;
+    const end = Math.min(currentPage * rowsPerPage, totalRows);
+
+    document.getElementById("pageInfo").innerText =
+        `Page ${currentPage} of ${totalPages}`;
+
+    document.getElementById("recordInfo").innerText =
+        `Showing ${start}-${end} of ${totalRows} records`;
+
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages;
+}
+
+//Pagination Buttons//
+document.getElementById("prevPage").addEventListener("click", () => {
+    if(currentPage > 1){
+        currentPage--;
+        applyFilters();
+    }
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+    currentPage++;
+    applyFilters();
+});
 
 /* =========================
    INITIAL LOAD
