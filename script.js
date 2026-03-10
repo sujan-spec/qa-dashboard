@@ -165,7 +165,6 @@ document.getElementById("sheetSelector").addEventListener("change", async functi
    APPLY FILTERS
 ========================= */
 function applyFilters() {
-    currentPage = 1;
 
     const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
     const qaValue = document.getElementById("qaFilter").value.toLowerCase().trim();
@@ -182,6 +181,7 @@ function applyFilters() {
             (!qaValue || qa.includes(qaValue)) &&
             (!statusValue || status === statusValue)
         );
+
     });
 
     updateDashboard(filteredData);
@@ -233,8 +233,8 @@ paginatedData.forEach((task, index) => {
 `;
 
     tbody.appendChild(tr);
-    updatePagination(data.length);
 });
+updatePagination(data.length);
 
 
     // ✅ Summary Cards
@@ -422,13 +422,14 @@ document.getElementById("exportBtn").addEventListener("click", () => {
         return matchSearch && matchQA && matchStatus;
     });
 
-    // ✅ Define CSV first
-    let csv = "QA,Jira,Related Jira,Task Type,Status,QA ETA(Sujan),QA ETA(Assignee),Developer,Priority,Complexity,QA Release,Client Release,Build QA,Remarks\n";
+//Define CSV first
+    let csv = "Sl.No.,QA,Jira,Related Jira,Task Type,Status,QA ETA(Sujan),QA ETA(Assignee),Developer,Priority,Complexity,QA Release,Client Release,Build QA,Remarks\n";
 
-    // ✅ Build rows
-    filteredData.forEach(task => {
+// Build rows
+    filteredData.forEach((task, index) => {
 
         const row = [
+            index + 1,
             task.qa || "",
             task.jira || "",
             task.relatedJira || "",
@@ -448,15 +449,15 @@ document.getElementById("exportBtn").addEventListener("click", () => {
         csv += `"${row.join('","')}"\n`;
     });
 
-    // ✅ Fix Excel UTF issue
+//Fix Excel UTF issue
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    // ✅ Get Sprint Name
+//Get Sprint Name
     const sprintName = document.getElementById("sheetSelector").value || "Sprint";
-    // ✅ Get Today Date
+//Get Today Date
     const today = new Date();
     const formattedDate =
         String(today.getDate()).padStart(2, '0') + "-" +
@@ -585,12 +586,12 @@ document.getElementById("compareBtn").addEventListener("click", async function (
         return;
     }
 
-    // disable button
+// disable button
     button.disabled = true;
     button.style.opacity = "0.6";
     button.style.cursor = "not-allowed";
 
-    // show loader
+// show loader
     overlay.style.display = "block";
 
     try {
@@ -600,15 +601,19 @@ document.getElementById("compareBtn").addEventListener("click", async function (
         alert("Error loading comparison chart");
     }
 
-    // hide loader
+// hide loader
     overlay.style.display = "none";
 
-    // enable button again
+// enable button again
     button.disabled = false;
     button.style.opacity = "1";
     button.style.cursor = "pointer";
 
+    document.getElementById("comparisonPlaceholder").style.display = "none";
+    document.getElementById("comparisonChart").style.display = "block";
+
 });
+
 
 /* =========================
    BUILD CHART DATA
@@ -724,15 +729,41 @@ function updatePagination(totalRows){
 
 //Pagination Buttons//
 document.getElementById("prevPage").addEventListener("click", () => {
-    if(currentPage > 1){
+
+    if (currentPage > 1) {
         currentPage--;
         applyFilters();
     }
+
 });
 
 document.getElementById("nextPage").addEventListener("click", () => {
-    currentPage++;
-    applyFilters();
+
+    const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
+    const qaValue = document.getElementById("qaFilter").value.toLowerCase().trim();
+    const statusValue = document.getElementById("statusFilter").value.toLowerCase().trim();
+
+    const filteredData = allData.filter(task => {
+
+        const jira = task.jira.toLowerCase();
+        const qa = task.qa.toLowerCase();
+        const status = task.status.toLowerCase();
+
+        return (
+            (!searchValue || jira.includes(searchValue)) &&
+            (!qaValue || qa.includes(qaValue)) &&
+            (!statusValue || status === statusValue)
+        );
+
+    });
+
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    if (currentPage < totalPages) {
+        currentPage++;
+        updateDashboard(filteredData);
+    }
+
 });
 
 /* =========================
