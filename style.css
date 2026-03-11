@@ -32,11 +32,19 @@ header h1 {
     margin: 0;
 }
 
-.summary {
-    display: flex;
-    justify-content: space-around;
-    padding: 20px;
-    flex-wrap: wrap;
+.summary{
+    padding:20px 40px;
+}
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:20px;
+    flex-wrap:nowrap;
+}
+
+.summary-row .card{
+    flex:1;
 }
 
 .card {
@@ -482,5 +490,14 @@ header h1 {
 
 #comparisonChart{
     display:none;
+}
+
+.footer{
+    background: linear-gradient(90deg, #1e3c72, #2a5298);
+    color:#cbd5e1;
+    text-align:center;
+    padding:12px 10px;
+    font-size:13px;
+    margin-top:40px;
 }
 
